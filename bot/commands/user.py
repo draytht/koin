@@ -40,16 +40,28 @@ class UserCommands(commands.Cog):
     @user_group.command(name="profile", description="View your profile")
     async def user_profile(self, ctx: discord.ApplicationContext):
         await ctx.defer(ephemeral=True)
-        user = await user_service.get_user(str(ctx.author.id))
-        if not user:
-            await ctx.respond(embed=error_embed("No profile found. Run `/user create` first."))
-            return
-        embed = discord.Embed(title="Your Profile", color=discord.Color.blurple())
-        embed.add_field(name="Username", value=user.username, inline=True)
-        embed.add_field(name="Currency", value=user.currency, inline=True)
-        embed.add_field(name="Timezone", value=user.timezone, inline=True)
-        embed.set_footer(text=f"Member since {user.created_at.strftime('%b %d, %Y')}")
-        await ctx.respond(embed=embed)
+        try:
+            user = await user_service.get_user_profile(str(ctx.author.id))
+            if not user:
+                await ctx.followup.send(embed=error_embed("No profile found. Run `/user create` first."))
+                return
+            embed = discord.Embed(title="Your Profile", color=discord.Color.blurple())
+            embed.add_field(name="Username", value=user.username, inline=True)
+            embed.add_field(name="Currency", value=user.currency, inline=True)
+            embed.add_field(name="Timezone", value=user.timezone, inline=True)
+            embed.add_field(name="Total Income", value=f"{user.total_income:.2f} {user.currency}", inline=True)
+            embed.add_field(name="Total Expenses", value=f"{user.total_expenses:.2f} {user.currency}", inline=True)
+            embed.add_field(name="Net Worth", value=f"{user.net_worth:.2f} {user.currency}", inline=True)
+            embed.add_field(name="Total Debts", value=f"{user.total_debts:.2f} {user.currency}", inline=True)
+            embed.add_field(name="Total Savings", value=f"{user.total_savings:.2f} {user.currency}", inline=True)
+            embed.add_field(name="Monthly Budget", value=f"{user.monthly_budget:.2f} {user.currency}", inline=True)
+            embed.add_field(name="Financial Health", value=user.financial_health, inline=True)
+            embed.add_field(name="AI Insights", value=user.ai_insights or "No insights yet", inline=False)
+            embed.set_thumbnail(url=ctx.author.display_avatar.url)
+            embed.set_footer(text=f"Member since {user.created_at.strftime('%b %d, %Y')}")
+            await ctx.followup.send(embed=embed)
+        except Exception as e:
+            await ctx.followup.send(embed=error_embed(f"Failed to fetch profile: {e}"))
 
 
 def setup(bot: discord.Bot) -> UserCommands:

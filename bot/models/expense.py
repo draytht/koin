@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator
-from datetime import date
+from datetime import date as date_type
 from uuid import UUID
 from typing import Optional
 
@@ -12,7 +12,7 @@ class Expense(BaseModel):
     merchant: Optional[str] = None
     note: Optional[str] = None
     payment_method: Optional[str] = None
-    date: date
+    date: date_type
     recurring: bool = False
     receipt_id: Optional[UUID] = None
 
@@ -30,5 +30,5 @@ class ExpenseCreate(BaseModel):
     merchant: Optional[str] = None
     note: Optional[str] = None
     payment_method: Optional[str] = None
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     recurring: bool = False

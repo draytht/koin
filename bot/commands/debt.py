@@ -20,7 +20,6 @@ class DebtCommands(commands.Cog):
         debt_name: discord.Option(str, "Name for this debt (e.g. Visa, Student Loan)", required=True),
         creditor: discord.Option(str, "Who you owe (e.g. Chase, Sallie Mae)", required=True),
         total_amount: discord.Option(float, "Original total amount", required=True),
-        current_balance: discord.Option(float, "Current balance owed", required=True),
         interest_rate: discord.Option(float, "Annual interest rate as % (e.g. 19.99)", required=True),
         minimum_payment: discord.Option(float, "Monthly minimum payment", required=True),
         due_date: discord.Option(str, "Payment due date (YYYY-MM-DD)", required=False),
@@ -42,7 +41,6 @@ class DebtCommands(commands.Cog):
                 debt_name=debt_name,
                 creditor=creditor,
                 total_amount=total_amount,
-                current_balance=current_balance,
                 interest_rate=interest_rate,
                 minimum_payment=minimum_payment,
                 due_date=parsed_due,
@@ -55,7 +53,7 @@ class DebtCommands(commands.Cog):
             )
             embed.add_field(name="Name", value=result["debt_name"], inline=True)
             embed.add_field(name="Creditor", value=result["creditor"], inline=True)
-            embed.add_field(name="Balance", value=f"${result['current_balance']:,.2f}", inline=True)
+            embed.add_field(name="Total Amount", value=f"${result['total_amount']:,.2f}", inline=True)
             embed.add_field(name="Rate", value=f"{result['interest_rate']*100:.2f}% APR", inline=True)
             embed.add_field(name="Min Payment", value=f"${result['minimum_payment']:,.2f}/mo", inline=True)
             await ctx.respond(embed=embed)
@@ -78,7 +76,6 @@ class DebtCommands(commands.Cog):
         self,
         ctx: discord.ApplicationContext,
         debt_name: discord.Option(str, "Name of the debt to update", required=True),
-        current_balance: discord.Option(float, "New current balance", required=False),
         minimum_payment: discord.Option(float, "New minimum payment", required=False),
         note: discord.Option(str, "Updated note", required=False),
     ):
@@ -86,8 +83,6 @@ class DebtCommands(commands.Cog):
         try:
             user_id = await require_profile(str(ctx.author.id))
             updates = {}
-            if current_balance is not None:
-                updates["current_balance"] = current_balance
             if minimum_payment is not None:
                 updates["minimum_payment"] = minimum_payment
             if note is not None:
@@ -97,7 +92,7 @@ class DebtCommands(commands.Cog):
                 return
             result = await debt_service.update_debt(user_id, debt_name, updates)
             embed = discord.Embed(title=f"Debt Updated: {debt_name}", color=discord.Color.orange())
-            embed.add_field(name="Balance", value=f"${result['current_balance']:,.2f}", inline=True)
+            embed.add_field(name="Min Payment", value=f"${result['minimum_payment']:,.2f}/mo", inline=True)
             await ctx.respond(embed=embed)
         except ValueError as e:
             await ctx.respond(embed=error_embed(str(e)))

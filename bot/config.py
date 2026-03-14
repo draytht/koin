@@ -34,6 +34,7 @@ class Config:
         "image": (3, 60),
         "ai": (5, 300),
         "graph": (5, 60),
+        "save": (10, 60),
     }
 
 

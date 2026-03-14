@@ -21,7 +21,7 @@ class AICommands(commands.Cog):
         discord_id = str(ctx.author.id)
 
         if not check_rate_limit(discord_id, "ai"):
-            await ctx.respond(embed=error_embed("AI rate limit reached. Wait a few minutes."))
+            await ctx.followup.send(embed=error_embed("AI rate limit reached. Wait a few minutes."), ephemeral=True)
             return
 
         try:
@@ -43,7 +43,7 @@ class AICommands(commands.Cog):
         discord_id = str(ctx.author.id)
 
         if not check_rate_limit(discord_id, "ai"):
-            await ctx.respond(embed=error_embed("AI rate limit reached. Wait a few minutes."))
+            await ctx.followup.send(embed=error_embed("AI rate limit reached. Wait a few minutes."), ephemeral=True)
             return
 
         try:
@@ -55,6 +55,9 @@ class AICommands(commands.Cog):
             await ctx.followup.send(embed=embed, ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
+        except Exception as e:
+            logger.error(f"AI monthly plan failed: {e}", exc_info=True)
+            await ctx.followup.send(embed=error_embed("Failed to build monthly plan. Try again later."), ephemeral=True)
 
     @ai_group.command(name="debt_strategy", description="Get a debt payoff strategy")
     async def ai_debt_strategy(self, ctx: discord.ApplicationContext):
@@ -62,7 +65,7 @@ class AICommands(commands.Cog):
         discord_id = str(ctx.author.id)
 
         if not check_rate_limit(discord_id, "ai"):
-            await ctx.respond(embed=error_embed("AI rate limit reached. Wait a few minutes."))
+            await ctx.followup.send(embed=error_embed("AI rate limit reached. Wait a few minutes."), ephemeral=True)
             return
 
         try:
@@ -73,6 +76,9 @@ class AICommands(commands.Cog):
             await ctx.followup.send(embed=embed, ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
+        except Exception as e:
+            logger.error(f"AI debt strategy failed: {e}", exc_info=True)
+            await ctx.followup.send(embed=error_embed("Failed to generate debt strategy. Try again later."), ephemeral=True)
 
     @ai_group.command(name="saving_advice", description="Get personalized saving suggestions")
     async def ai_saving_advice(self, ctx: discord.ApplicationContext):
@@ -80,7 +86,7 @@ class AICommands(commands.Cog):
         discord_id = str(ctx.author.id)
 
         if not check_rate_limit(discord_id, "ai"):
-            await ctx.respond(embed=error_embed("AI rate limit reached. Wait a few minutes."))
+            await ctx.followup.send(embed=error_embed("AI rate limit reached. Wait a few minutes."), ephemeral=True)
             return
 
         try:
@@ -91,6 +97,9 @@ class AICommands(commands.Cog):
             await ctx.followup.send(embed=embed, ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
+        except Exception as e:
+            logger.error(f"AI saving advice failed: {e}", exc_info=True)
+            await ctx.followup.send(embed=error_embed("Failed to generate saving advice. Try again later."), ephemeral=True)
 
 
 def setup(bot: discord.Bot) -> AICommands:

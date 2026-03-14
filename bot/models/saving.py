@@ -4,17 +4,17 @@ from uuid import UUID
 from typing import Optional
 
 
-class Income(BaseModel):
+class Saving(BaseModel):
     id: UUID
     user_id: UUID
     amount: float
-    source: str
+    goal: str
     note: Optional[str] = None
     date: date_type
 
 
-class IncomeCreate(BaseModel):
+class SavingCreate(BaseModel):
     amount: float
-    source: str
+    goal: str
     note: Optional[str] = None
     date: Optional[date_type] = None

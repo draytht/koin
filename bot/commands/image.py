@@ -90,8 +90,15 @@ class ReceiptConfirmView(discord.ui.View):
             from bot.utils.validators import validate_date
             exp_date = validate_date(self.parsed.get("date"))
 
+            total = self.parsed.get("total")
+            if not total:
+                await interaction.followup.send(
+                    embed=error_embed("Could not extract total from receipt. Please log this expense manually with `/spend`."),
+                    ephemeral=True,
+                )
+                return
             data = ExpenseCreate(
-                amount=self.parsed.get("total") or 0.01,
+                amount=total,
                 category=self.category,
                 merchant=self.parsed.get("merchant"),
                 date=exp_date,

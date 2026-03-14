@@ -1,7 +1,7 @@
 import discord
 import logging
 from bot.config import config
-from bot.commands import user, spend, earn, debt, image, ai_commands, graph, help
+from bot.commands import user, spend, earn, debt, image, ai_commands, graph, help, save
 
 logging.basicConfig(
     level=logging.INFO,
@@ -10,10 +10,13 @@ logging.basicConfig(
 logger = logging.getLogger("koin")
 
 intents = discord.Intents.default()
-bot = discord.Bot(intents=intents)
+bot = discord.Bot(
+    intents=intents,
+    debug_guilds=[config.DISCORD_GUILD_ID] if config.DISCORD_GUILD_ID else None,
+)
 
 # Register cogs
-cogs = [user, spend, earn, debt, image, ai_commands, graph, help]
+cogs = [user, spend, earn, debt, image, ai_commands, graph, help, save]
 for cog_module in cogs:
     bot.add_cog(cog_module.setup(bot))
 

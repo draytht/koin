@@ -14,7 +14,7 @@ async def add_debt(user_id: str, data: DebtCreate) -> dict:
         "debt_name": data.debt_name,
         "creditor": data.creditor,
         "total_amount": data.total_amount,
-        "current_balance": data.current_balance,
+        "current_balance": data.total_amount,
         "interest_rate": data.interest_rate / 100,  # store as decimal
         "minimum_payment": data.minimum_payment,
         "due_date": data.due_date.isoformat() if data.due_date else None,

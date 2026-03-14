@@ -22,7 +22,6 @@ class DebtCreate(BaseModel):
     debt_name: str
     creditor: str
     total_amount: float
-    current_balance: float
     interest_rate: float
     minimum_payment: float
     due_date: Optional[date] = None

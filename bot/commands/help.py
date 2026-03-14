@@ -23,6 +23,7 @@ class HelpCommands(commands.Cog):
             value=(
                 "`/spend` — Log an expense\n"
                 "`/earn` — Log income\n"
+                "`/save` — Set up recurring transactions\n"
                 "`/image` — Upload a receipt for automatic extraction"
             ),
             inline=False,
