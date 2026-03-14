@@ -10,10 +10,7 @@ logging.basicConfig(
 logger = logging.getLogger("koin")
 
 intents = discord.Intents.default()
-bot = discord.Bot(
-    intents=intents,
-    debug_guilds=[config.DISCORD_GUILD_ID] if config.DISCORD_GUILD_ID else None,
-)
+bot = discord.Bot(intents=intents)
 
 # Register cogs
 cogs = [user, spend, earn, debt, image, ai_commands, graph, help, save]

@@ -57,7 +57,7 @@ class UserCommands(commands.Cog):
             embed.add_field(name="Monthly Budget", value=f"{user.monthly_budget:.2f} {user.currency}", inline=True)
             embed.add_field(name="Financial Health", value=user.financial_health, inline=True)
             embed.add_field(name="AI Insights", value=user.ai_insights or "No insights yet", inline=False)
-            embed.set_thumbnail(url=ctx.author.display_avatar.url)
+            embed.set_thumbnail(url=ctx.author.display_avatar.url)                  
             embed.set_footer(text=f"Member since {user.created_at.strftime('%b %d, %Y')}")
             await ctx.followup.send(embed=embed)
         except Exception as e:
