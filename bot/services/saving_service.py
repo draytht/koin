@@ -48,3 +48,60 @@ async def get_monthly_savings_total(user_id: str) -> float:
 
     result = await asyncio.to_thread(_query)
     return sum(row["amount"] for row in (result.data or []))
+
+
+async def list_savings(user_id: str, limit: int = 10) -> list[dict]:
+    supabase = get_supabase()
+
+    def _query():
+        return (
+            supabase.table("savings")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("date", desc=True)
+            .limit(limit)
+            .execute()
+        )
+
+    result = await asyncio.to_thread(_query)
+    return result.data or []
+
+
+async def find_saving(user_id: str, save_date: date, goal: str, amount: float | None = None) -> list[dict]:
+    supabase = get_supabase()
+
+    def _query():
+        q = (
+            supabase.table("savings")
+            .select("*")
+            .eq("user_id", user_id)
+            .eq("date", save_date.isoformat())
+            .eq("goal", goal)
+        )
+        if amount is not None:
+            q = q.eq("amount", amount)
+        return q.execute()
+
+    result = await asyncio.to_thread(_query)
+    return result.data or []
+
+
+async def delete_saving(user_id: str, saving_id: str) -> None:
+    supabase = get_supabase()
+
+    def _delete():
+        return supabase.table("savings").delete().eq("user_id", user_id).eq("id", saving_id).execute()
+
+    await asyncio.to_thread(_delete)
+
+
+async def update_saving(user_id: str, saving_id: str, updates: dict) -> dict:
+    supabase = get_supabase()
+
+    def _update():
+        return supabase.table("savings").update(updates).eq("user_id", user_id).eq("id", saving_id).execute()
+
+    result = await asyncio.to_thread(_update)
+    if not result.data:
+        raise ValueError("Saving entry not found.")
+    return result.data[0]

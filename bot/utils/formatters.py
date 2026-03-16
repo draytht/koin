@@ -238,6 +238,55 @@ def income_updated_embed(result: dict, currency_symbol: str = "$") -> discord.Em
     return embed
 
 
+def saving_list_embed(savings: list[dict], currency_symbol: str = "$") -> discord.Embed:
+    embed = discord.Embed(title="🏦  Your Savings", color=COLOR_SAVING)
+    if not savings:
+        embed.description = "No savings logged yet.\nUse `/save log` to add one."
+        return embed
+
+    total = sum(s["amount"] for s in savings)
+    goals: dict[str, float] = {}
+    for s in savings:
+        goals[s["goal"]] = goals.get(s["goal"], 0) + s["amount"]
+
+    for goal, subtotal in sorted(goals.items(), key=lambda x: -x[1]):
+        entries = [s for s in savings if s["goal"] == goal]
+        lines = "\n".join(
+            f"• {currency(e['amount'], currency_symbol)}  ·  {fmt_date(e['date'])}"
+            + (f"  — {e['note']}" if e.get("note") else "")
+            for e in entries
+        )
+        embed.add_field(
+            name=f"🎯  {goal.replace('_', ' ').title()}  ·  {currency(subtotal, currency_symbol)}",
+            value=lines,
+            inline=False,
+        )
+
+    embed.set_footer(text=f"💰  Total shown · {currency(total, currency_symbol)}")
+    return embed
+
+
+def saving_deleted_embed(entry: dict, currency_symbol: str = "$") -> discord.Embed:
+    return discord.Embed(
+        title="🗑️  Saving Entry Removed",
+        description=(
+            f"🎯  **{entry['goal'].replace('_', ' ').title()}**\n"
+            f"{currency(entry['amount'], currency_symbol)}  ·  {fmt_date(entry['date'])}"
+        ),
+        color=COLOR_WARNING,
+    )
+
+
+def saving_updated_embed(result: dict, currency_symbol: str = "$") -> discord.Embed:
+    embed = discord.Embed(title="✏️  Saving Entry Updated", color=COLOR_SAVING)
+    embed.add_field(name="💰  Amount", value=currency(result["amount"], currency_symbol),            inline=True)
+    embed.add_field(name="🎯  Goal",   value=result["goal"].replace("_", " ").title(),               inline=True)
+    embed.add_field(name="📅  Date",   value=fmt_date(result["date"]),                               inline=True)
+    if result.get("note"):
+        embed.add_field(name="📝  Note", value=result["note"], inline=False)
+    return embed
+
+
 def receipt_preview_embed(parsed: dict, currency_symbol: str = "$") -> discord.Embed:
     embed = discord.Embed(
         title="🧾  Receipt Preview",
@@ -274,10 +323,11 @@ def user_profile_embed(user, avatar_url: str | None = None) -> discord.Embed:
     net_color = COLOR_INCOME if net >= 0 else COLOR_EXPENSE
 
     embed = discord.Embed(
-        title=f"👤  {user.username}'s Profile",
+        title=f"{user.username}'s Profile",
         color=net_color,
     )
     if avatar_url:
+        embed.set_author(name=user.username, icon_url=avatar_url)
         embed.set_thumbnail(url=avatar_url)
 
     embed.add_field(name="💱  Currency",      value=user.currency,                                        inline=True)

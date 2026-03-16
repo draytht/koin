@@ -40,7 +40,12 @@ class HelpCommands(commands.Cog):
 
         embed.add_field(
             name="🏦  Savings",
-            value="`/save` — Log a saving",
+            value=(
+                "`/save log` — Log a saving\n"
+                "`/save list` — View recent savings\n"
+                "`/save update` — Correct an entry\n"
+                "`/save delete` — Remove an entry"
+            ),
             inline=True,
         )
         embed.add_field(
