@@ -49,8 +49,11 @@ class SpendCommands(commands.Cog):
             embed = expense_embed(
                 amount=result["amount"],
                 category=result["category"],
-                merchant=result.get("merchant"),
                 monthly_total=result["monthly_category_total"],
+                merchant=result.get("merchant"),
+                note=result.get("note"),
+                payment_method=result.get("payment_method"),
+                date=exp_date,
             )
             await ctx.respond(embed=embed)
         except ValueError as e:

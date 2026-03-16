@@ -7,7 +7,7 @@ from bot.middleware.rate_limiter import check_rate_limit
 from bot.middleware.user_guard import require_profile
 from bot.services import income_service
 from bot.models.income import IncomeCreate
-from bot.utils.formatters import income_embed, error_embed
+from bot.utils.formatters import income_embed, income_deleted_embed, income_updated_embed, error_embed
 from bot.utils.validators import INCOME_SOURCES
 
 
@@ -44,8 +44,9 @@ class EarnCommands(commands.Cog):
                 amount=result["amount"],
                 source=result["source"],
                 monthly_total=result["monthly_income_total"],
+                note=result.get("note"),
+                date=inc_date,
             )
-            embed.add_field(name="Date", value=inc_date.strftime("%m-%d-%y"), inline=True)
             await ctx.followup.send(embed=embed, ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
@@ -85,12 +86,7 @@ class EarnCommands(commands.Cog):
 
             entry = matches[0]
             await income_service.delete_income(user_id, entry["id"])
-            embed = discord.Embed(
-                title="Income Entry Deleted",
-                color=discord.Color.orange(),
-                description=f"Removed **${entry['amount']:,.2f}** from **{entry['source'].replace('_', ' ').title()}** on {entry['date']}.",
-            )
-            await ctx.followup.send(embed=embed, ephemeral=True)
+            await ctx.followup.send(embed=income_deleted_embed(entry), ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
         except Exception as e:
@@ -147,13 +143,7 @@ class EarnCommands(commands.Cog):
 
             entry = matches[0]
             result = await income_service.update_income(user_id, entry["id"], updates)
-            embed = discord.Embed(title="Income Entry Updated", color=discord.Color.blue())
-            embed.add_field(name="Amount", value=f"${result['amount']:,.2f}", inline=True)
-            embed.add_field(name="Source", value=result["source"].replace("_", " ").title(), inline=True)
-            embed.add_field(name="Date", value=result["date"], inline=True)
-            if result.get("note"):
-                embed.add_field(name="Note", value=result["note"], inline=False)
-            await ctx.followup.send(embed=embed, ephemeral=True)
+            await ctx.followup.send(embed=income_updated_embed(result), ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
         except Exception as e:

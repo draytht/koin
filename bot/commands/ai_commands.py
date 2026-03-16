@@ -3,7 +3,7 @@ from discord.ext import commands
 from bot.middleware.rate_limiter import check_rate_limit
 from bot.middleware.user_guard import require_profile
 from bot.services import ai_service
-from bot.utils.formatters import error_embed
+from bot.utils.formatters import ai_embed, error_embed, COLOR_INFO, COLOR_SAVING, COLOR_DEBT, COLOR_INCOME
 import logging
 
 logger = logging.getLogger(__name__)
@@ -28,8 +28,7 @@ class AICommands(commands.Cog):
             user_id = await require_profile(discord_id)
             await ctx.followup.send("Analyzing your finances...", ephemeral=True)
             response = await ai_service.analyze(user_id, "full financial health analysis")
-            embed = discord.Embed(title="Financial Analysis", description=response, color=discord.Color.blurple())
-            embed.set_footer(text="Based on last 30 days of data")
+            embed = ai_embed("Financial Analysis", "🤖", response, "📅  Based on last 30 days of data", COLOR_INFO)
             await ctx.followup.send(embed=embed, ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
@@ -50,8 +49,7 @@ class AICommands(commands.Cog):
             user_id = await require_profile(discord_id)
             await ctx.followup.send("Building your monthly plan...", ephemeral=True)
             response = await ai_service.analyze(user_id, "suggested monthly budget plan for next month", days=90)
-            embed = discord.Embed(title="Monthly Budget Plan", description=response, color=discord.Color.gold())
-            embed.set_footer(text="Based on last 90 days of data")
+            embed = ai_embed("Monthly Budget Plan", "📆", response, "📅  Based on last 90 days of data", COLOR_SAVING)
             await ctx.followup.send(embed=embed, ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
@@ -72,7 +70,7 @@ class AICommands(commands.Cog):
             user_id = await require_profile(discord_id)
             await ctx.followup.send("Calculating debt strategy...", ephemeral=True)
             response = await ai_service.analyze(user_id, "debt payoff strategy: compare avalanche vs snowball, recommend best approach for this debt profile")
-            embed = discord.Embed(title="Debt Payoff Strategy", description=response, color=discord.Color.red())
+            embed = ai_embed("Debt Payoff Strategy", "🔴", response, "💡  Avalanche vs Snowball comparison", COLOR_DEBT)
             await ctx.followup.send(embed=embed, ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
@@ -93,7 +91,7 @@ class AICommands(commands.Cog):
             user_id = await require_profile(discord_id)
             await ctx.followup.send("Finding saving opportunities...", ephemeral=True)
             response = await ai_service.analyze(user_id, "identify specific saving opportunities and suggest concrete monthly savings targets")
-            embed = discord.Embed(title="Saving Advice", description=response, color=discord.Color.green())
+            embed = ai_embed("Saving Opportunities", "🏦", response, "💡  Personalized to your spending patterns", COLOR_INCOME)
             await ctx.followup.send(embed=embed, ephemeral=True)
         except ValueError as e:
             await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)

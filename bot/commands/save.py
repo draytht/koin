@@ -4,17 +4,8 @@ from bot.middleware.rate_limiter import check_rate_limit
 from bot.middleware.user_guard import require_profile
 from bot.services import saving_service
 from bot.models.saving import SavingCreate
-from bot.utils.formatters import error_embed
+from bot.utils.formatters import saving_embed, error_embed
 from bot.utils.validators import validate_date
-
-
-def saving_embed(amount: float, goal: str, monthly_total: float, currency_symbol: str = "$") -> discord.Embed:
-    embed = discord.Embed(color=discord.Color.gold())
-    embed.title = "Saving Logged"
-    embed.add_field(name="Amount", value=f"{currency_symbol}{amount:,.2f}", inline=True)
-    embed.add_field(name="Goal", value=goal.replace("_", " ").title(), inline=True)
-    embed.set_footer(text=f"Monthly savings total: {currency_symbol}{monthly_total:,.2f}")
-    return embed
 
 
 class SaveCommands(commands.Cog):
@@ -47,6 +38,8 @@ class SaveCommands(commands.Cog):
                 amount=result["amount"],
                 goal=result["goal"],
                 monthly_total=result["monthly_total"],
+                note=result.get("note"),
+                date=save_date,
             )
             await ctx.respond(embed=embed)
         except ValueError as e:
