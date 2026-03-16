@@ -1,32 +1,32 @@
 import logging
-from openai import AsyncOpenAI
+import anthropic
 from bot.config import config
 
 logger = logging.getLogger(__name__)
 
-_client: AsyncOpenAI | None = None
+_client: anthropic.AsyncAnthropic | None = None
 
 
-def get_llm_client() -> AsyncOpenAI:
+def get_llm_client() -> anthropic.AsyncAnthropic:
     global _client
     if _client is None:
-        _client = AsyncOpenAI(api_key=config.OPENAI_API_KEY)
+        _client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY)
     return _client
 
 
 async def chat_completion(system_prompt: str, user_prompt: str, temperature: float = 0.4) -> str:
     client = get_llm_client()
     try:
-        response = await client.chat.completions.create(
-            model=config.OPENAI_MODEL,
+        response = await client.messages.create(
+            model=config.ANTHROPIC_MODEL,
+            system=system_prompt,
             messages=[
-                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
             temperature=temperature,
             max_tokens=900,
         )
-        return response.choices[0].message.content or ""
+        return response.content[0].text if response.content else ""
     except Exception as e:
         logger.error(f"LLM call failed: {e}")
         raise

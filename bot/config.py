@@ -18,8 +18,8 @@ class Config:
     SUPABASE_URL: str = _require("SUPABASE_URL")
     SUPABASE_SERVICE_KEY: str = _require("SUPABASE_SERVICE_KEY")
 
-    OPENAI_API_KEY: str = _require("OPENAI_API_KEY")
-    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    ANTHROPIC_API_KEY: str = _require("ANTHROPIC_API_KEY")
+    ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5")
 
     OCR_PROVIDER: str = os.getenv("OCR_PROVIDER", "tesseract")
     GOOGLE_VISION_API_KEY: str = os.getenv("GOOGLE_VISION_API_KEY", "")

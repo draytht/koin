@@ -33,12 +33,17 @@ def validate_amount(amount: float) -> float:
 
 
 def validate_date(date_str: str | None) -> date:
-    if date_str is None:
+    if date_str is None or date_str.strip().lower() in ("today", ""):
         return date.today()
-    try:
-        parsed = date.fromisoformat(date_str)
-        if parsed > date.today():
-            raise ValueError("Date cannot be in the future.")
-        return parsed
-    except ValueError as e:
-        raise ValueError(f"Invalid date format. Use YYYY-MM-DD. {e}")
+    from datetime import datetime
+    for fmt in ("%m-%d-%y", "%Y-%m-%d"):
+        try:
+            parsed = datetime.strptime(date_str, fmt).date()
+            if parsed > date.today():
+                raise ValueError("Date cannot be in the future.")
+            return parsed
+        except ValueError as e:
+            if "future" in str(e):
+                raise
+            continue
+    raise ValueError("Invalid date format. Use MM-DD-YY (e.g. 03-14-26).")

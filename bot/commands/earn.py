@@ -1,5 +1,8 @@
+import logging
 import discord
 from discord.ext import commands
+
+logger = logging.getLogger(__name__)
 from bot.middleware.rate_limiter import check_rate_limit
 from bot.middleware.user_guard import require_profile
 from bot.services import income_service
@@ -19,13 +22,13 @@ class EarnCommands(commands.Cog):
         amount: discord.Option(float, "Amount earned", required=True),
         source: discord.Option(str, "Income source", required=True, choices=INCOME_SOURCES),
         note: discord.Option(str, "Optional note", required=False),
-        date: discord.Option(str, "Date (YYYY-MM-DD, default: today)", required=False),
+        date: discord.Option(str, "Date (MM-DD-YY, default: today)", required=False),
     ):
         await ctx.defer(ephemeral=True)
         discord_id = str(ctx.author.id)
 
         if not check_rate_limit(discord_id, "earn"):
-            await ctx.respond(embed=error_embed("Too many requests. Try again in a minute."))
+            await ctx.followup.send(embed=error_embed("Too many requests. Try again in a minute."), ephemeral=True)
             return
 
         try:
@@ -40,9 +43,13 @@ class EarnCommands(commands.Cog):
                 source=result["source"],
                 monthly_total=result["monthly_income_total"],
             )
-            await ctx.respond(embed=embed)
+            embed.add_field(name="Date", value=inc_date.strftime("%m-%d-%y"), inline=True)
+            await ctx.followup.send(embed=embed, ephemeral=True)
         except ValueError as e:
-            await ctx.respond(embed=error_embed(str(e)))
+            await ctx.followup.send(embed=error_embed(str(e)), ephemeral=True)
+        except Exception as e:
+            logger.error(f"Earn command failed: {e}", exc_info=True)
+            await ctx.followup.send(embed=error_embed("Something went wrong. Please try again."), ephemeral=True)
 
 
 def setup(bot: discord.Bot) -> EarnCommands:
