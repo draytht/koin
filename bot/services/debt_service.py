@@ -71,6 +71,17 @@ async def list_debts(user_id: str) -> list[dict]:
     return result.data or []
 
 
+async def delete_debt(user_id: str, debt_name: str) -> None:
+    supabase = get_supabase()
+
+    def _delete():
+        return supabase.table("debts").delete().eq("user_id", user_id).eq("debt_name", debt_name).execute()
+
+    result = await asyncio.to_thread(_delete)
+    if not result.data:
+        raise ValueError(f"No debt named '{debt_name}' found.")
+
+
 async def get_all_debts(user_id: str) -> list[dict]:
     """All debts including paid off, for AI analysis."""
     supabase = get_supabase()
