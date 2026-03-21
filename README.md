@@ -24,7 +24,6 @@ docker-compose up -d
 
 In Discord, run `/user create` to set up your profile, then `/help` to see all commands.
 
-## Commands
 
 | Command | Description |
 |---------|-------------|
