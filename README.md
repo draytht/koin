@@ -91,3 +91,5 @@ In Discord, run `/user create` to set up your profile, then `/help` to see all c
 | Command | Description |
 |---------|-------------|
 | `/help` | Show all commands |
+
+![Sample](image.png)
